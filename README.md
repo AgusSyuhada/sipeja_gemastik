@@ -142,7 +142,7 @@ SIPEJA (Sistem Pelaporan Jalan / Road Reporting System) enables community-driven
 
 ### APK Release
 
-Download the latest version: [SIPEJA v1.0](https://github.com/AgusSyuhada/sipeja-gemastik/releases/download/v1.0/SIPEJA-Release-Version.apk)
+Download the latest version: [SIPEJA v0.1.0](https://github.com/AgusSyuhada/sipeja_gemastik/releases/tag/v0.1.0)
 
 ### Demo Account
 
