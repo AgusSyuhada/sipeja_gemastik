@@ -1,0 +1,21 @@
+# Flutter-related
+**/Flutter/ephemeral/
+**/Pods/
+
+# Xcode-related
+**/dgph
+**/xcuserdata/
+
+# Build outputs
+build/
+
+# Swift Package Manager
+.swiftpm/
+.build/
+
+# Xcode project files (user-specific)
+*.xcuserstate
+*.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
+
+# Firebase / API Keys
+GoogleService-Info.plist

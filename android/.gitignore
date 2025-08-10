@@ -1,0 +1,38 @@
+gradle-wrapper.jar
+/.gradle
+/captures/
+/gradlew
+/gradlew.bat
+/local.properties
+/app/google-services.json
+GeneratedPluginRegistrant.java
+.cxx/
+
+# Remember to never publicly share your keystore.
+# See https://flutter.dev/to/reference-keystore
+key.properties
+**/*.keystore
+**/*.jks
+
+# Build outputs tambahan
+/app/build/
+*/build/
+
+# Gradle cache tambahan
+.gradle/
+**/.gradle/
+
+# NDK / C++ build intermediates
+.externalNativeBuild/
+
+# Generated Flutter files
+GeneratedPluginRegistrant.java
+flutter_generated/
+
+# Keystore & properties
+*.properties
+!gradle.properties # kecuali kalau memang ingin commit
+
+# Lain-lain
+**/outputs/
+**/intermediates/

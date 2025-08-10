@@ -1,0 +1,9 @@
+flutter/ephemeral
+
+# Build outputs
+build/
+
+# Generated files
+flutter/ephemeral/
+generated_plugin_registrant.cc
+generated_plugin_registrant.h
