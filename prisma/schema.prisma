@@ -1,0 +1,409 @@
+// ==================== PRISMA SCHEMA ====================
+// prisma/schema.prisma
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ==================== USER MANAGEMENT ====================
+model User {
+  id               String    @id @default(uuid())
+  firebaseUid      String    @unique @map("firebase_uid")
+  email            String    @unique
+  password         String
+  name             String
+  phone            String?
+  address          String?
+  profilePicture   String?   @map("profile_picture")
+  role             UserRole  @default(CITIZEN)
+  points           Int       @default(0)
+  isActive         Boolean   @default(true) @map("is_active")
+  tokenVersion     Int       @default(0) @map("token_version")
+  createdAt        DateTime  @default(now()) @map("created_at")
+  updatedAt        DateTime  @updatedAt @map("updated_at")
+  lastLoginAt      DateTime? @map("last_login_at")
+
+  // Relations
+  reports            Report[]
+  votes              Vote[]
+  comments           Comment[]
+  notifications      Notification[]
+  badges             UserBadge[]
+  reportAssignments  ReportAssignment[] @relation("StakeholderAssignments")
+  assignedReports    ReportAssignment[] @relation("AssignerAssignments")
+  reportStatusHistories ReportStatusHistory[] @relation("UserStatusChanges")
+  userSessions       UserSession[]
+
+  @@map("users")
+}
+
+model UserSession {
+  id           String   @id @default(uuid())
+  userId       String   @map("user_id")
+  token        String
+  refreshToken String   @map("refresh_token")
+  deviceInfo   String?
+  ipAddress    String?
+  isActive     Boolean  @default(true) @map("is_active")
+  expiresAt    DateTime @map("expires_at")
+  createdAt    DateTime @default(now()) @map("created_at")
+  updatedAt    DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+  @@map("user_sessions")
+}
+
+enum UserRole {
+  CITIZEN
+  STAKEHOLDER
+  ADMIN
+
+  @@map("user_role")
+}
+
+// ==================== POTHOLE REPORTS ====================
+model Report {
+  id               String       @id @default(uuid())
+  title            String
+  description      String
+  latitude         Float
+  longitude        Float
+  address          String
+  severity         Severity     @default(MEDIUM)
+  status           ReportStatus @default(PENDING)
+  priority         Float        @default(0)
+  voteCount        Int          @default(0) @map("vote_count")
+  commentCount     Int          @default(0) @map("comment_count")
+  viewCount        Int          @default(0) @map("view_count")
+  isAnonymous      Boolean      @default(false) @map("is_anonymous")
+  createdAt        DateTime     @default(now()) @map("created_at")
+  updatedAt        DateTime     @updatedAt @map("updated_at")
+  completedAt      DateTime?    @map("completed_at")
+
+  // Foreign Keys
+  userId           String       @map("user_id")
+  categoryId       String       @map("category_id")
+
+  // Relations
+  user             User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+  category         Category     @relation(fields: [categoryId], references: [id])
+  media            ReportMedia[]
+  votes            Vote[]
+  comments         Comment[]
+  statusHistory    ReportStatusHistory[]
+  assignments      ReportAssignment[]
+
+  @@index([latitude, longitude])
+  @@index([status])
+  @@index([createdAt])
+  @@index([priority])
+  @@index([userId])
+  @@map("reports")
+}
+
+enum Severity {
+  LOW
+  MEDIUM
+  HIGH
+  CRITICAL
+
+  @@map("severity")
+}
+
+enum ReportStatus {
+  PENDING
+  VERIFIED
+  IN_PROGRESS
+  COMPLETED
+  REJECTED
+  DUPLICATE
+
+  @@map("report_status")
+}
+
+// ==================== REPORT CATEGORIES ====================
+model Category {
+  id          String   @id @default(uuid())
+  name        String   @unique
+  description String?
+  icon        String?
+  color       String?
+  isActive    Boolean  @default(true) @map("is_active")
+  sortOrder   Int      @default(0) @map("sort_order")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  // Relations
+  reports     Report[]
+
+  @@map("categories")
+}
+
+// ==================== MEDIA FILES ====================
+model ReportMedia {
+  id          String    @id @default(uuid())
+  filename    String
+  originalName String   @map("original_name")
+  mimeType    String    @map("mime_type")
+  size        Int
+  url         String
+  thumbnailUrl String?  @map("thumbnail_url")
+  mediaType   MediaType @map("media_type")
+  sortOrder   Int       @default(0) @map("sort_order")
+  createdAt   DateTime  @default(now()) @map("created_at")
+
+  // Foreign Keys
+  reportId    String    @map("report_id")
+
+  // Relations
+  report      Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@index([reportId])
+  @@map("report_media")
+}
+
+enum MediaType {
+  IMAGE
+  VIDEO
+
+  @@map("media_type")
+}
+
+// ==================== VOTING SYSTEM ====================
+model Vote {
+  id        String   @id @default(uuid())
+  voteType  VoteType @map("vote_type")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  // Foreign Keys
+  userId    String   @map("user_id")
+  reportId  String   @map("report_id")
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report    Report   @relation(fields: [reportId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, reportId])
+  @@index([reportId])
+  @@map("votes")
+}
+
+enum VoteType {
+  UP
+  DOWN
+
+  @@map("vote_type")
+}
+
+// ==================== COMMENT SYSTEM ====================
+model Comment {
+  id          String    @id @default(uuid())
+  content     String
+  isEdited    Boolean   @default(false) @map("is_edited")
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+
+  // Foreign Keys
+  userId      String    @map("user_id")
+  reportId    String    @map("report_id")
+  parentId    String?   @map("parent_id")
+
+  // Relations
+  user        User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  report      Report    @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  parent      Comment?  @relation("CommentReplies", fields: [parentId], references: [id])
+  replies     Comment[] @relation("CommentReplies")
+
+  @@index([reportId])
+  @@index([userId])
+  @@index([parentId])
+  @@map("comments")
+}
+
+// ==================== REPORT STATUS TRACKING ====================
+model ReportStatusHistory {
+  id          String       @id @default(uuid())
+  fromStatus  ReportStatus? @map("from_status")
+  toStatus    ReportStatus  @map("to_status")
+  note        String?
+  createdAt   DateTime     @default(now()) @map("created_at")
+
+  // Foreign Keys
+  reportId    String       @map("report_id")
+  changedBy   String       @map("changed_by")
+
+  // Relations
+  report      Report       @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  user        User          @relation("UserStatusChanges", fields: [changedBy], references: [id])
+
+  @@index([reportId])
+  @@map("report_status_history")
+}
+
+// ==================== STAKEHOLDER ASSIGNMENTS ====================
+model ReportAssignment {
+  id            String             @id @default(uuid())
+  status        AssignmentStatus   @default(ASSIGNED)
+  assignedAt    DateTime           @default(now()) @map("assigned_at")
+  completedAt   DateTime?          @map("completed_at")
+  note          String?
+
+  // Foreign Keys
+  reportId      String             @map("report_id")
+  stakeholderId String             @map("stakeholder_id")
+  assignedBy    String             @map("assigned_by")
+
+  // Relations
+  report        Report             @relation(fields: [reportId], references: [id], onDelete: Cascade)
+  stakeholder   User               @relation("StakeholderAssignments", fields: [stakeholderId], references: [id])
+  assigner      User               @relation("AssignerAssignments", fields: [assignedBy], references: [id])
+
+  @@unique([reportId, stakeholderId])
+  @@index([stakeholderId])
+  @@map("report_assignments")
+}
+
+enum AssignmentStatus {
+  ASSIGNED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+
+  @@map("assignment_status")
+}
+
+// ==================== NOTIFICATION SYSTEM ====================
+model Notification {
+  id          String           @id @default(uuid())
+  title       String
+  message     String
+  type        NotificationType
+  isRead      Boolean          @default(false) @map("is_read")
+  data        Json?            // Additional data for the notification
+  createdAt   DateTime         @default(now()) @map("created_at")
+
+  // Foreign Keys
+  userId      String           @map("user_id")
+
+  // Relations
+  user        User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, isRead])
+  @@index([createdAt])
+  @@map("notifications")
+}
+
+enum NotificationType {
+  REPORT_STATUS_UPDATED
+  NEW_COMMENT
+  NEW_VOTE
+  BADGE_EARNED
+  LEADERBOARD_UPDATE
+  REPORT_ASSIGNED
+  SYSTEM_ANNOUNCEMENT
+
+  @@map("notification_type")
+}
+
+// ==================== BADGE SYSTEM ====================
+model Badge {
+  id          String      @id @default(uuid())
+  name        String      @unique
+  description String
+  icon        String
+  color       String      @default("#3B82F6")
+  requirement String      // JSON string describing the requirement
+  points      Int         @default(0)
+  rarity      BadgeRarity @default(COMMON)
+  isActive    Boolean     @default(true) @map("is_active")
+  createdAt   DateTime    @default(now()) @map("created_at")
+  updatedAt   DateTime    @updatedAt @map("updated_at")
+
+  // Relations
+  userBadges  UserBadge[]
+
+  @@map("badges")
+}
+
+enum BadgeRarity {
+  COMMON
+  UNCOMMON
+  RARE
+  EPIC
+  LEGENDARY
+
+  @@map("badge_rarity")
+}
+
+model UserBadge {
+  id        String   @id @default(uuid())
+  earnedAt  DateTime @default(now()) @map("earned_at")
+
+  // Foreign Keys
+  userId    String   @map("user_id")
+  badgeId   String   @map("badge_id")
+
+  // Relations
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  badge     Badge    @relation(fields: [badgeId], references: [id])
+
+  @@unique([userId, badgeId])
+  @@index([userId])
+  @@map("user_badges")
+}
+
+// ==================== ANALYTICS & STATISTICS ====================
+model DailyStats {
+  id              String   @id @default(uuid())
+  date            DateTime @unique @db.Date
+  totalReports    Int      @default(0) @map("total_reports")
+  completedReports Int     @default(0) @map("completed_reports")
+  newUsers        Int      @default(0) @map("new_users")
+  totalVotes      Int      @default(0) @map("total_votes")
+  totalComments   Int      @default(0) @map("total_comments")
+  activeUsers     Int      @default(0) @map("active_users")
+  createdAt       DateTime @default(now()) @map("created_at")
+  updatedAt       DateTime @updatedAt @map("updated_at")
+
+  @@index([date])
+  @@map("daily_stats")
+}
+
+// ==================== SYSTEM SETTINGS ====================
+model Setting {
+  id          String   @id @default(uuid())
+  key         String   @unique
+  value       String
+  description String?
+  isPublic    Boolean  @default(false) @map("is_public")
+  createdAt   DateTime @default(now()) @map("created_at")
+  updatedAt   DateTime @updatedAt @map("updated_at")
+
+  @@map("settings")
+}
+
+// ==================== API KEYS FOR EXTERNAL INTEGRATIONS ====================
+model ApiKey {
+  id          String     @id @default(uuid())
+  name        String
+  keyHash     String     @unique @map("key_hash")
+  permissions Json       // Array of allowed permissions
+  isActive    Boolean    @default(true) @map("is_active")
+  lastUsedAt  DateTime?  @map("last_used_at")
+  expiresAt   DateTime?  @map("expires_at")
+  createdAt   DateTime   @default(now()) @map("created_at")
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  // Foreign Keys
+  createdBy   String     @map("created_by")
+
+  @@index([keyHash])
+  @@map("api_keys")
+}

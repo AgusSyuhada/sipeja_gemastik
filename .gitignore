@@ -1,0 +1,39 @@
+# Node modules
+node_modules/
+
+# Logs
+logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Runtime
+pids
+*.pid
+*.seed
+*.pid.lock
+
+# Environment variable files
+.env
+.env.*
+
+# Prisma
+prisma/migrations/
+*.db
+*.sqlite
+*.env
+
+# OS / Editor files
+.DS_Store
+Thumbs.db
+
+# Optional: Ignore build folders (jika ada)
+dist/
+build/
+
+
+#firebase
+firebase-adminsdk.json
+*firebase-adminsdk*.json
+serviceAccountKey.json
