@@ -13,39 +13,7 @@ SIPEJA (Sistem Pelaporan Jalan / Road Reporting System) enables community-driven
 
 ## 📸 Application Screenshots
 
-### Authentication Flow
-
-![Login Screen](Screenshot/1-1_Auth_Login.png)
-![Register Screen](Screenshot/1-2_Auth_Register.png)
-![Forgot Password](Screenshot/1-3_Auth_ForgotPassword.png)
-![Privacy Policy](Screenshot/1-4_Auth_PrivacyPolicy.png)
-
-### Home Dashboard
-
-![Home Content 1](Screenshot/2-0_Home_Content1.png)
-![Home Content 2](Screenshot/2-0_Home_Content2.png)
-![Report Detail 1](Screenshot/2-1_Home_ReportDetail-1.png)
-![Report Detail 2](Screenshot/2-1_Home_ReportDetail-2.png)
-![Full Size Image](Screenshot/2-2_Home_ReportDetail-FullSizeImage.png)
-![Full Size Map](Screenshot/2-2_Home_ReportDetail-FullSizeMap.png)
-
-### Report Management
-
-![Add Report Confirmation](Screenshot/3-1_AddReport_AddLocationReport-Confirmation.png)
-![Location Report Dialog](Screenshot/3-1_AddReport_AddLocationReport-DialogImagePicker.png)
-![Select From Map](Screenshot/3-1_AddReport_AddLocationReport-SelectFromMap.png)
-![Add Location Report](Screenshot/3-1_AddReport_AddLocationReport.png)
-![Add Detail Report](Screenshot/3-2_AddReport_AddDetailReport.png)
-![Preview Input 1](Screenshot/3-3_AddReport_PreviewInputAddReport-1.png)
-![Preview Input 2](Screenshot/3-3_AddReport_PreviewInputAddReport-2.png)
-![Dialog Confirmation](Screenshot/3-3_AddReport_PreviewInputAddReport-DialogConfirmation.png)
-![Dialog Success](Screenshot/3-3_AddReport_PreviewInputAddReport-DialogSuccess.png)
-![Loading Indicator](Screenshot/3-3_AddReport_PreviewInputAddReport-LoadingIndicator.png)
-
-### User Profile
-
-![Profile Detail](Screenshot/4-0_Profile_ProfileDetail.png)
-![Profile Logout Dialog](Screenshot/4-1_Profile_LogoutDialog.png)
+![Profile Logout Dialog](Screenshot/0_ApplicationScreenhot.png)
 
 ## 🚀 Features
 
