@@ -13,7 +13,7 @@ SIPEJA (Sistem Pelaporan Jalan / Road Reporting System) enables community-driven
 
 ## 📸 Application Screenshots
 
-![Profile Logout Dialog](Screenshot/0_ApplicationScreenhot.png)
+![Application Screenshot](Screenshot/0_ApplicationScreenshot.png)
 
 ## 🚀 Features
 
